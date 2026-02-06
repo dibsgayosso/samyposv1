@@ -131,4 +131,8 @@ $lang['receivings_validation_pending'] = 'Pending validation';
 $lang['receivings_validation_approved'] = 'Validated';
 $lang['receivings_payment_status'] = 'Payment status';
 $lang['receivings_validated_by'] = 'Validated by';
+$lang['receivings_validation_success'] = 'Receiving validated successfully.';
+$lang['receivings_validation_failed'] = 'Unable to validate receiving.';
+$lang['receivings_validation_already_done'] = 'Receiving was already validated.';
+$lang['receivings_validation_missing_columns'] = 'Validation columns are missing. Please run the receivings validation migration.';
 ?>

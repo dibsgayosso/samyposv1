@@ -41,6 +41,11 @@ for ($k = 1; $k <= NUMBER_OF_PEOPLE_CUSTOM_FIELDS; $k++) {
 </div>
 
 <div class="manage_buttons hidden-print">
+	<?php if (!empty($validation_message)) { ?>
+		<div class="alert alert-<?php echo H($validation_message_type); ?>">
+			<?php echo H($validation_message); ?>
+		</div>
+	<?php } ?>
 	<div class="row">
 		<div class="col-md-7">
 			<span class="hidden-print search no-left-border">

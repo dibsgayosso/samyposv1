@@ -1430,6 +1430,8 @@ class Receivings extends Secure_area
 		$data['employee']=$emp_info->first_name.' '.$emp_info->last_name;
 		$data['receiving_id']='RECV '.$receiving_id;
 		$data['receiving_id_raw']=$receiving_id;
+		$data['validation_message'] = $this->session->flashdata('receivings_validation_message');
+		$data['validation_message_type'] = $this->session->flashdata('receivings_validation_message_type') ?: 'success';
 		$data['receiving_validated_at'] = $receiving_info['validated_at'];
 		$data['receiving_validated_by_name'] = '';
 		$data['can_validate_receiving'] = $this->Employee->has_module_action_permission('receivings', 'edit_receiving', $this->Employee->get_logged_in_employee_info()->person_id);
@@ -1469,13 +1471,37 @@ class Receivings extends Secure_area
 	{
 		$this->check_action_permission('edit_receiving');
 
+		if (!$this->db->field_exists('validated_by', 'receivings') || !$this->db->field_exists('validated_at', 'receivings'))
+		{
+			$this->session->set_flashdata('receivings_validation_message', lang('receivings_validation_missing_columns'));
+			$this->session->set_flashdata('receivings_validation_message_type', 'danger');
+			redirect('receivings/receipt/'.$receiving_id);
+			return;
+		}
+
 		$receiving_info = $this->Receiving->get_info($receiving_id)->row_array();
 		if ($receiving_info && empty($receiving_info['validated_at']))
 		{
-			$this->Receiving->update(array(
+			$success = $this->Receiving->update(array(
 				'validated_by' => $this->Employee->get_logged_in_employee_info()->person_id,
 				'validated_at' => date('Y-m-d H:i:s'),
 			), $receiving_id);
+
+			if ($success)
+			{
+				$this->session->set_flashdata('receivings_validation_message', lang('receivings_validation_success'));
+				$this->session->set_flashdata('receivings_validation_message_type', 'success');
+			}
+			else
+			{
+				$this->session->set_flashdata('receivings_validation_message', lang('receivings_validation_failed'));
+				$this->session->set_flashdata('receivings_validation_message_type', 'danger');
+			}
+		}
+		else
+		{
+			$this->session->set_flashdata('receivings_validation_message', lang('receivings_validation_already_done'));
+			$this->session->set_flashdata('receivings_validation_message_type', 'info');
 		}
 
 		redirect('receivings/receipt/'.$receiving_id);
