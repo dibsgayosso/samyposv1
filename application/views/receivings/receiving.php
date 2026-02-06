@@ -578,6 +578,8 @@ $has_cost_price_permission = $this->Employee->has_module_action_permission('item
 						<th class="sp_date"><?php echo lang('common_date'); ?></th>
 						<th class="sp_charge"><?php echo lang('common_total_charge_to_account'); ?></th>
 						<th class="sp_comment"><?php echo lang('common_comment'); ?></th>
+						<th class="sp_validation"><?php echo lang('receivings_validation_status'); ?></th>
+						<th class="sp_payment_status"><?php echo lang('receivings_payment_status'); ?></th>
 						<th class="sp_pay"><?php echo lang('common_pay'); ?></th>
 					</tr>
 				</thead>
@@ -587,18 +589,29 @@ $has_cost_price_permission = $this->Employee->has_module_action_permission('item
 					<?php
 					foreach ($unpaid_store_account_receivings as $unpaid_receiving) {
 
-						$row_class = isset($unpaid_receiving['paid']) && $unpaid_receiving['paid'] == TRUE ? 'success' : 'active';
-						$btn_class = isset($unpaid_receiving['paid']) && $unpaid_receiving['paid'] == TRUE ? 'btn-danger' : 'btn-primary';
+						$is_paid = isset($unpaid_receiving['paid']) && $unpaid_receiving['paid'] == TRUE;
+						$is_validated = !empty($unpaid_receiving['validated_at']);
+						$row_class = $is_paid ? 'success' : 'active';
+						$btn_class = $is_paid ? 'btn-danger' : 'btn-primary';
+						$validation_label = $is_validated ? lang('receivings_validation_approved') : lang('receivings_validation_pending');
+						$payment_label = $is_paid ? lang('common_paid') : lang('common_unpaid');
+						$can_pay = $is_validated || $is_paid;
 					?>
 						<tr class="<?php echo $row_class; ?>">
 							<td class="sp_receiving_id text-center"><?php echo anchor('receivings/receipt/' . $unpaid_receiving['receiving_id'], 'RECV ' . $unpaid_receiving['receiving_id'], array('target' => '_blank')); ?></td>
 							<td class="sp_date text-center"><?php echo date(get_date_format() . ' ' . get_time_format(), strtotime($unpaid_receiving['receiving_time'])); ?></td>
 							<td class="sp_charge text-center"><?php echo to_currency($unpaid_receiving['payment_amount']); ?></td>
 							<td class="sp_comment text-center"><?php echo $unpaid_receiving['comment'] ?></td>
+							<td class="sp_validation text-center"><?php echo $validation_label; ?></td>
+							<td class="sp_payment_status text-center"><?php echo $payment_label; ?></td>
 							<td class="sp_pay text-center">
-								<?php echo form_open("receivings/" . ((isset($unpaid_receiving['paid']) && $unpaid_receiving['paid'] == TRUE) ? "delete" : "pay") . "_store_account_receiving/" . $unpaid_receiving['receiving_id'] . "/" . to_currency_no_money($unpaid_receiving['payment_amount']), array('class' => 'pay_store_account_receiving_form', 'autocomplete' => 'off', 'data-full-amount' => to_currency_no_money($unpaid_receiving['payment_amount']))); ?>
-								<button type="submit" class="btn <?php echo $btn_class; ?> pay_store_account_receiving"><?php echo isset($unpaid_receiving['paid']) && $unpaid_receiving['paid'] == TRUE  ? lang('common_remove_payment') : lang('common_pay'); ?></button>
-								</form>
+								<?php if ($can_pay) { ?>
+									<?php echo form_open("receivings/" . ($is_paid ? "delete" : "pay") . "_store_account_receiving/" . $unpaid_receiving['receiving_id'] . "/" . to_currency_no_money($unpaid_receiving['payment_amount']), array('class' => 'pay_store_account_receiving_form', 'autocomplete' => 'off', 'data-full-amount' => to_currency_no_money($unpaid_receiving['payment_amount']))); ?>
+									<button type="submit" class="btn <?php echo $btn_class; ?> pay_store_account_receiving"><?php echo $is_paid ? lang('common_remove_payment') : lang('common_pay'); ?></button>
+									</form>
+								<?php } else { ?>
+									<button type="button" class="btn btn-default" disabled><?php echo lang('receivings_validation_pending'); ?></button>
+								<?php } ?>
 							</td>
 						</tr>
 				<?php

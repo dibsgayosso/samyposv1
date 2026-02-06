@@ -125,4 +125,10 @@ $lang['receivings_give_discount'] = 'Give Discount';
 $lang['receivings_global_receiving_discount_fixed'] = 'Discount Entire Receiving';
 $lang['receivings_set_discount_fixed_or_percent'] = 'Set Discount (% or fixed)';
 $lang['receivings_discount_percent'] = 'Discount Percent';
+$lang['receivings_validate_receiving'] = 'Validate Receiving';
+$lang['receivings_validation_status'] = 'Validation';
+$lang['receivings_validation_pending'] = 'Pending validation';
+$lang['receivings_validation_approved'] = 'Validated';
+$lang['receivings_payment_status'] = 'Payment status';
+$lang['receivings_validated_by'] = 'Validated by';
 ?>
