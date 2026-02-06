@@ -1930,7 +1930,7 @@ class Receiving extends MY_Model
 	{
 		$store_account_in_all_languages = get_all_language_values_for_key('common_store_account','common');
 		
-		$this->db->select('receivings.receiving_id, receiving_time, SUM(payment_amount) - COALESCE(partial_payment_amount,0) as payment_amount,receivings.comment', false);
+		$this->db->select('receivings.receiving_id, receiving_time, SUM(payment_amount) - COALESCE(partial_payment_amount,0) as payment_amount,receivings.comment,receivings.validated_at,receivings.validated_by', false);
 		$this->db->from('receivings');
 		
 		$this->db->where('receivings.deleted',0);

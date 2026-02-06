@@ -1430,6 +1430,18 @@ class Receivings extends Secure_area
 		$data['employee']=$emp_info->first_name.' '.$emp_info->last_name;
 		$data['receiving_id']='RECV '.$receiving_id;
 		$data['receiving_id_raw']=$receiving_id;
+		$data['receiving_validated_at'] = $receiving_info['validated_at'];
+		$data['receiving_validated_by_name'] = '';
+		$data['can_validate_receiving'] = $this->Employee->has_module_action_permission('receivings', 'edit_receiving', $this->Employee->get_logged_in_employee_info()->person_id);
+
+		if (!empty($receiving_info['validated_by']))
+		{
+			$validated_employee = $this->Employee->get_info($receiving_info['validated_by']);
+			if ($validated_employee)
+			{
+				$data['receiving_validated_by_name'] = $validated_employee->first_name.' '.$validated_employee->last_name;
+			}
+		}
 		
 		$data['signature_file_id'] = $receiving_info['signature_image_id'];
 
@@ -1451,6 +1463,22 @@ class Receivings extends Secure_area
 		$this->load->view("receivings/receipt",$data);
 		$receipt_cart->destroy();
 		
+	}
+
+	function validate_receiving($receiving_id)
+	{
+		$this->check_action_permission('edit_receiving');
+
+		$receiving_info = $this->Receiving->get_info($receiving_id)->row_array();
+		if ($receiving_info && empty($receiving_info['validated_at']))
+		{
+			$this->Receiving->update(array(
+				'validated_by' => $this->Employee->get_logged_in_employee_info()->person_id,
+				'validated_at' => date('Y-m-d H:i:s'),
+			), $receiving_id);
+		}
+
+		redirect('receivings/receipt/'.$receiving_id);
 	}
 	
 	function edit($receiving_id)
@@ -1731,6 +1759,13 @@ class Receivings extends Secure_area
 	
 	function pay_store_account_receiving($receiving_id, $amount)
 	{
+		$receiving_info = $this->Receiving->get_info($receiving_id)->row_array();
+		if (empty($receiving_info['validated_at']))
+		{
+			$this->_reload();
+			return;
+		}
+
 		$this->cart->add_paid_store_account_payment_id($receiving_id,$amount);
 		$cart = $this->cart->get_items();
 		foreach($cart as $item)
@@ -1760,6 +1795,10 @@ class Receivings extends Secure_area
 		
 			foreach($unpaid_recvs as $unpaid_recv)
 			{
+				if (empty($unpaid_recv['validated_at']))
+				{
+					continue;
+				}
 					$this->cart->add_paid_store_account_payment_id($unpaid_recv['receiving_id'],$unpaid_recv['payment_amount']);
 					$amount_to_pay +=$unpaid_recv['payment_amount'];
 			}

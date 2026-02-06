@@ -3941,6 +3941,8 @@ CREATE TABLE `phppos_receivings` (
   `receiving_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `supplier_id` int(10) DEFAULT NULL,
   `employee_id` int(10) NOT NULL DEFAULT '0',
+  `validated_by` int(10) DEFAULT NULL,
+  `validated_at` datetime DEFAULT NULL,
   `comment` text COLLATE utf8_unicode_ci NOT NULL,
   `receiving_id` int(10) NOT NULL AUTO_INCREMENT,
   `payment_type` text COLLATE utf8_unicode_ci,
@@ -3982,6 +3984,7 @@ CREATE TABLE `phppos_receivings` (
   PRIMARY KEY (`receiving_id`),
   KEY `supplier_id` (`supplier_id`),
   KEY `employee_id` (`employee_id`),
+  KEY `validated_by` (`validated_by`),
   KEY `deleted` (`deleted`),
   KEY `location_id` (`location_id`),
   KEY `transfer_to_location_id` (`transfer_to_location_id`),
@@ -4001,7 +4004,8 @@ CREATE TABLE `phppos_receivings` (
   CONSTRAINT `phppos_receivings_ibfk_2` FOREIGN KEY (`supplier_id`) REFERENCES `phppos_suppliers` (`person_id`),
   CONSTRAINT `phppos_receivings_ibfk_3` FOREIGN KEY (`location_id`) REFERENCES `phppos_locations` (`location_id`),
   CONSTRAINT `phppos_receivings_ibfk_4` FOREIGN KEY (`transfer_to_location_id`) REFERENCES `phppos_locations` (`location_id`),
-  CONSTRAINT `phppos_receivings_ibfk_5` FOREIGN KEY (`signature_image_id`) REFERENCES `phppos_app_files` (`file_id`)
+  CONSTRAINT `phppos_receivings_ibfk_5` FOREIGN KEY (`signature_image_id`) REFERENCES `phppos_app_files` (`file_id`),
+  CONSTRAINT `phppos_receivings_ibfk_6` FOREIGN KEY (`validated_by`) REFERENCES `phppos_employees` (`person_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 

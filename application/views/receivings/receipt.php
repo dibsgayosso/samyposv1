@@ -61,6 +61,13 @@ for ($k = 1; $k <= NUMBER_OF_PEOPLE_CUSTOM_FIELDS; $k++) {
 
 					<?php }
 					}	?>
+					<?php if (!empty($can_validate_receiving) && empty($receiving_validated_at) && (empty($deleted) || (!$deleted))) { ?>
+						<li>
+							<?php echo form_open("receivings/validate_receiving/" . $receiving_id_raw, array('id' => 'receivings_validate_form')); ?>
+							<button class="btn btn-success btn-lg hidden-print" id="validate_recv"> <?php echo lang('receivings_validate_receiving', '', array(), TRUE); ?> </button>
+							</form>
+						</li>
+					<?php } ?>
 					<li>
 						<button class="btn btn-primary btn-lg hidden-print" id="barcode_labels_button" onClick="window.location='<?php echo site_url('items/generate_barcodes_labels_from_recv/' . $receiving_id_raw); ?>'" ;> <?php echo lang('common_barcode_labels', '', array(), TRUE); ?> </button>
 					</li>
@@ -145,6 +152,11 @@ for ($k = 1; $k <= NUMBER_OF_PEOPLE_CUSTOM_FIELDS; $k++) {
 							<?php
 							} ?>
 							<li id="employee"><span><?php echo lang('common_employee', '', array(), TRUE) . ": "; ?></span><?php echo H($employee); ?></li>
+							<li id="receiving_validation_status"><span><?php echo lang('receivings_validation_status', '', array(), TRUE) . ": "; ?></span><?php echo empty($receiving_validated_at) ? lang('receivings_validation_pending', '', array(), TRUE) : lang('receivings_validation_approved', '', array(), TRUE); ?></li>
+							<?php if (!empty($receiving_validated_at)) { ?>
+								<li id="receiving_validated_by"><span><?php echo lang('receivings_validated_by', '', array(), TRUE) . ": "; ?></span><?php echo H($receiving_validated_by_name ?: lang('common_not_set')); ?></li>
+								<li id="receiving_validated_at"><span><?php echo lang('common_date', '', array(), TRUE) . ": "; ?></span><?php echo H(date(get_date_format() . ' ' . get_time_format(), strtotime($receiving_validated_at))); ?></li>
+							<?php } ?>
 						</ul>
 					</div>
 					<?php if (isset($supplier) || isset($transfer_to_location)) { ?>
