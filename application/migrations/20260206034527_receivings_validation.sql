@@ -1,8 +1,8 @@
 ALTER TABLE `phppos_receivings`
-  ADD COLUMN IF NOT EXISTS `validated_by` int(10) DEFAULT NULL AFTER `employee_id`;
+  ADD COLUMN `validated_by` int(10) DEFAULT NULL AFTER `employee_id`;
 
 ALTER TABLE `phppos_receivings`
-  ADD COLUMN IF NOT EXISTS `validated_at` datetime DEFAULT NULL AFTER `validated_by`;
+  ADD COLUMN `validated_at` datetime DEFAULT NULL AFTER `validated_by`;
 
 ALTER TABLE `phppos_receivings`
   ADD KEY `validated_by` (`validated_by`);
